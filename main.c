@@ -1,4 +1,7 @@
 #include "helper.h"
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdio.h>
 
 int main(int argc, char** argv) {
     if (*(argv + 1) == NULL) {
@@ -100,53 +103,78 @@ int main(int argc, char** argv) {
     (*(char*)tmp_buf) = 16;
     tmp_buf = tmp_buf + 8;
     (*(char*)tmp_buf) = 16;
-    
+
     tmp_buf = tmp_buf - totalSize - 8;
 
     memcpy(ram, tmp_buf, totalSize + 16);
 
-    /*uint64_t* pointerOne =  (uint64_t*) tmp_buf;
+    uint64_t* pointerOne =  (uint64_t*) tmp_buf;
     int pointOneFlag = *pointerOne & 1;
     int pointerOneID = *pointerOne & 6;
     pointerOneID = pointerOneID >> 1;
     int pointerOneSize = *pointerOne >> 3;
-    pointerOneSize = size * 8;
+    pointerOneSize = pointerOneSize * 8;
 
-    tmp_buf = tmp_buf + size;
-    
+    tmp_buf = tmp_buf + pointerOneSize;
+
     uint64_t* pointerTwo =  (uint64_t*) tmp_buf;
     int pointTwoFlag = *pointerTwo & 1;
     int pointerTwoID = *pointerTwo & 6;
     pointerTwoID = pointerTwoID >> 1;
     int pointerTwoSize = *pointerTwo >> 3;
-    pointerTwoSize = pointerTwo * 8;
-    
+    pointerTwoSize = pointerTwoSize * 8;
+
     while(pointerTwoSize != 0)
     {
-      if(pointOneFlag == 1 && pointTwoFlag == 1 && pointerOneID == pointerTwoID)
+      if(pointOneFlag == 0 && pointTwoFlag == 0 && pointerOneID == pointerTwoID)
       {
-        int* pointerOneSizePointer = *pointerOne >> 3;
-        int* pointerTwoSizePointer = *pointerTwo >> 3;
-        pointerOneSizePointer = pointerOneSizePointer + pointerTwoSizePointer;
-        tmp_buf = tmp_buf + pointerTwoSize;
-        pointerTwo = (uint64_t*) tmp_buf;
         
+        pointOneFlag = *pointerOne & 1;
+        pointerOneID = *pointerOne & 6;
+        pointerOneID = pointerOneID >> 1;
+        pointerOneSize = *pointerOne >> 3;
+        pointerOneSize = pointerOneSize * 8;
+        (*(uint64_t*)pointerOne) += pointerTwoSize;
+        tmp_buf = tmp_buf + pointerTwoSize - 8;
+        uint64_t* footerOfCoalesce =  (uint64_t*) tmp_buf;
+        (*(uint64_t*)footerOfCoalesce) += pointerOneSize;
+        pointOneFlag = *footerOfCoalesce & 1;
+        pointerOneID = *footerOfCoalesce & 6;
+        pointerOneID = pointerOneID >> 1;
+        pointerOneSize = *footerOfCoalesce >> 3;
+        pointerOneSize = pointerOneSize * 8;
+        tmp_buf = tmp_buf + 8;
+
+        //moving Pointer 2 To next Block
+        pointerTwo = (uint64_t*) tmp_buf;
+        pointTwoFlag = *pointerTwo & 1;
+        pointerTwoSize = *pointerTwo >> 3;
+        pointerTwoSize = pointerTwoSize * 8;
+        pointerTwoID = *pointerTwo & 6;
+        pointerTwoID = pointerTwoID >> 1;
       }
       else
       {
         pointerOne = pointerTwo;
         pointOneFlag = *pointerOne & 1;
         pointerOneSize = *pointerOne >> 3;
-        pointerOneSize = size * 8;
-        
+        pointerOneSize = pointerOneSize * 8;
+        pointerOneID = *pointerOne & 6;
+        pointerOneID = pointerOneID >> 1;
+
         tmp_buf = tmp_buf + pointerTwoSize;
-        
+
         pointerTwo = (uint64_t*) tmp_buf;
         pointTwoFlag = *pointerTwo & 1;
         pointerTwoSize = *pointerTwo >> 3;
-        pointerTwoSize = pointerTwo * 8;
+        pointerTwoSize = pointerTwoSize * 8;
+        pointerTwoID = *pointerTwo & 6;
+        pointerTwoID = pointerTwoID >> 1;
       }
-    }*/
+    }
+    
+    tmp_buf = tmp_buf - totalSize - 16;
+    memcpy(ram, tmp_buf, totalSize + 16);
 
     /*
      * Do not modify code below.
