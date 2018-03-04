@@ -49,7 +49,6 @@ int main(int argc, char** argv) {
     //This sorts the blocks by id and flags and size(size starts at 32 and goes to a max of 1024)
     while(idCounter < 4)
     {
-      printf("IDCounter = %i and Flag is %i and size is %i \n" , idCounter, flagCounter, sizeCounter);
       sizeMoved = 0;
       block =  (uint64_t*) ram;
       flag = *block & 1;
@@ -67,7 +66,6 @@ int main(int argc, char** argv) {
         sizeMoved = sizeMoved + size;
         if(id == idCounter && flag == flagCounter && sizeCounter == size)
         {
-          printf("moved \n");
           memmove(tmp_buf, block, size);
           totalSize = totalSize + size;
           tmp_buf = tmp_buf + size;
