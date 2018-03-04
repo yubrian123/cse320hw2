@@ -31,6 +31,7 @@ int main(int argc, char** argv) {
 
     //Total Size of Blocks
     int totalSize = 0;
+    int numberOfBlocks = 0;
 
     //counters for flag and ID
     int idCounter = 1;
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
         if(id == idCounter && flag == flagCounter && sizeCounter == size)
         {
           memmove(tmp_buf, block, size);
+          numberOfBlocks++;
           totalSize = totalSize + size;
           tmp_buf = tmp_buf + size;
         }
@@ -95,12 +97,56 @@ int main(int argc, char** argv) {
         sizeCounter = sizeCounter + 16;
       }
     }
-
-    tmp_buf = tmp_buf - totalSize;
-
-    memcpy(ram, tmp_buf, totalSize);
-
+    (*(char*)tmp_buf) = 16;
+    tmp_buf = tmp_buf + 8;
+    (*(char*)tmp_buf) = 16;
     
+    tmp_buf = tmp_buf - totalSize - 8;
+
+    memcpy(ram, tmp_buf, totalSize + 16);
+
+    /*uint64_t* pointerOne =  (uint64_t*) tmp_buf;
+    int pointOneFlag = *pointerOne & 1;
+    int pointerOneID = *pointerOne & 6;
+    pointerOneID = pointerOneID >> 1;
+    int pointerOneSize = *pointerOne >> 3;
+    pointerOneSize = size * 8;
+
+    tmp_buf = tmp_buf + size;
+    
+    uint64_t* pointerTwo =  (uint64_t*) tmp_buf;
+    int pointTwoFlag = *pointerTwo & 1;
+    int pointerTwoID = *pointerTwo & 6;
+    pointerTwoID = pointerTwoID >> 1;
+    int pointerTwoSize = *pointerTwo >> 3;
+    pointerTwoSize = pointerTwo * 8;
+    
+    while(pointerTwoSize != 0)
+    {
+      if(pointOneFlag == 1 && pointTwoFlag == 1 && pointerOneID == pointerTwoID)
+      {
+        int* pointerOneSizePointer = *pointerOne >> 3;
+        int* pointerTwoSizePointer = *pointerTwo >> 3;
+        pointerOneSizePointer = pointerOneSizePointer + pointerTwoSizePointer;
+        tmp_buf = tmp_buf + pointerTwoSize;
+        pointerTwo = (uint64_t*) tmp_buf;
+        
+      }
+      else
+      {
+        pointerOne = pointerTwo;
+        pointOneFlag = *pointerOne & 1;
+        pointerOneSize = *pointerOne >> 3;
+        pointerOneSize = size * 8;
+        
+        tmp_buf = tmp_buf + pointerTwoSize;
+        
+        pointerTwo = (uint64_t*) tmp_buf;
+        pointTwoFlag = *pointerTwo & 1;
+        pointerTwoSize = *pointerTwo >> 3;
+        pointerTwoSize = pointerTwo * 8;
+      }
+    }*/
 
     /*
      * Do not modify code below.
