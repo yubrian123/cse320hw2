@@ -35,12 +35,12 @@ int main(int argc, char** argv) {
     //Total Size of Blocks
     int totalSize = 0;
     int numberOfBlocks = 0;
+    int pointerThruRam = 0;
 
     //counters for flag and ID
     int idCounter = 1;
     int flagCounter = 1;
     int sizeCounter = 32;
-    int sizeMoved = 0;
 
     //first_block
     uint64_t* block =  (uint64_t*) ram;
@@ -49,64 +49,73 @@ int main(int argc, char** argv) {
     id = id >> 1;
     size = *block >> 3;
     size = size * 8;
+    
 
     //This sorts the blocks by id and flags and size(size starts at 32 and goes to a max of 1024)
     while(idCounter < 4)
     {
-      sizeMoved = 0;
+      pointerThruRam = 0;
       block =  (uint64_t*) ram;
       flag = *block & 1;
       id = *block & 6;
       id = id >> 1;
       size = *block >> 3;
       size = size * 8;
-      while(size != 0)
+      while(pointerThruRam < 1024)
       {
         flag = *block & 1;
         id = *block & 6;
         id = id >> 1;
         size = *block >> 3;
         size = size * 8;
-        sizeMoved = sizeMoved + size;
         if(id == idCounter && flag == flagCounter && sizeCounter == size)
         {
           memmove(tmp_buf, block, size);
           numberOfBlocks++;
           totalSize = totalSize + size;
+          pointerThruRam = pointerThruRam + size;
           tmp_buf = tmp_buf + size;
+          ram = ram + size;
+          block = (uint64_t*) ram;
         }
-        ram = ram + size;
-        block = (uint64_t*) ram;
+        else
+        {
+          pointerThruRam = pointerThruRam + 8;
+          size = 8;
+          ram = ram + size;
+          block = (uint64_t*) ram;
+        }
       }
       if(sizeCounter == 1024)
       {
         if(flagCounter == 0)
         {
-          ram = ram - sizeMoved;
+          ram = ram - 1024;
           flagCounter = 1;
           sizeCounter = 32;
           idCounter++;
         }
         else
         {
-          ram = ram - sizeMoved;
+          ram = ram - 1024;
           sizeCounter = 32;
           flagCounter = 0;
         }
       }
       else
       {
-        ram = ram - sizeMoved;
+        ram = ram - 1024;
         sizeCounter = sizeCounter + 16;
       }
     }
+    
     (*(char*)tmp_buf) = 16;
     tmp_buf = tmp_buf + 8;
     (*(char*)tmp_buf) = 16;
 
     tmp_buf = tmp_buf - totalSize - 8;
 
-    memcpy(ram, tmp_buf, totalSize + 16);
+    memcpy(ram, tmp_buf, 1024);
 
     uint64_t* pointerOne =  (uint64_t*) tmp_buf;
     int pointOneFlag = *pointerOne & 1;
@@ -128,7 +137,7 @@ int main(int argc, char** argv) {
     {
       if(pointOneFlag == 0 && pointTwoFlag == 0 && pointerOneID == pointerTwoID)
       {
-        
+
         pointOneFlag = *pointerOne & 1;
         pointerOneID = *pointerOne & 6;
         pointerOneID = pointerOneID >> 1;
@@ -172,7 +181,7 @@ int main(int argc, char** argv) {
         pointerTwoID = pointerTwoID >> 1;
       }
     }
-    
+
     tmp_buf = tmp_buf - totalSize - 16;
     memcpy(ram, tmp_buf, totalSize + 16);
 
